@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/slack/:path*",
+      "destination": "https://hooks.slack.com/:path*"
+    }
+  ]
+}

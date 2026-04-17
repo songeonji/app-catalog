@@ -1,0 +1,98 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #4F7FFF;
+  --color-primary-light: #F0F4FF;
+  --color-primary-hover: #3D6DE8;
+  --color-dark: #1A1A2E;
+  --color-warm-white: #F5F5F0;
+  --color-surface: #FAFAF8;
+  --color-border: #E4E4E0;
+  --color-border-light: #F0F0EC;
+  --color-text-primary: #1A1A2E;
+  --color-text-secondary: #5A5A5A;
+  --color-text-muted: #8A8A8A;
+  --color-text-disabled: #C4C4C0;
+  --color-section-a: #FF8F6B;
+  --color-section-a-bg: #FFF5F0;
+  --color-section-b: #4F7FFF;
+  --color-section-b-bg: #F0F4FF;
+  --color-section-c: #50C878;
+  --color-section-c-bg: #F0FFF5;
+  --color-section-d: #9B6BFF;
+  --color-section-d-bg: #F5F0FF;
+  --font-sans: "Pretendard", system-ui, -apple-system, sans-serif;
+  --font-mono: "Inter", monospace;
+}
+
+/* Pretendard font via CDN */
+@font-face {
+  font-family: "Pretendard";
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  src: url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/woff2/Pretendard-Regular.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Pretendard";
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+  src: url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/woff2/Pretendard-Medium.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Pretendard";
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+  src: url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/woff2/Pretendard-SemiBold.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Pretendard";
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+  src: url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/woff2/Pretendard-ExtraBold.woff2") format("woff2");
+}
+
+html {
+  font-family: var(--font-sans);
+  color: var(--color-text-primary);
+  background-color: var(--color-warm-white);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100dvh;
+}
+
+#root {
+  min-height: 100dvh;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* ── Phone Mockup: hide scrollbars, show grab cursor ── */
+.phone-scroll {
+  scrollbar-width: none;          /* Firefox */
+  -ms-overflow-style: none;       /* IE/Edge */
+  cursor: grab;
+}
+.phone-scroll::-webkit-scrollbar {
+  display: none;                  /* Chrome/Safari */
+}
+.phone-scroll:active {
+  cursor: grabbing;
+}
