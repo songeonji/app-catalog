@@ -2,22 +2,36 @@ import type { Template, TemplateId } from '../types';
 
 interface TemplatePreviewProps {
   template: Template;
+  /**
+   * rising(기본): 썸네일 영역 바닥에서 살짝 올라온 모양 (갤러리 카드용)
+   * floating: 완전한 폰 형태로 배치 (추천 결과 카드용)
+   */
+  variant?: 'rising' | 'floating';
+  /** 크기 스케일 (기본 1.0). 추천 결과 메인 카드 등에서 확대/축소용 */
+  scale?: number;
 }
 
 /**
  * 시안별 mini UI preview.
- * 카드 썸네일 영역(h-48)에 들어가는 작은 폰 목업.
  * - A계열: GNB 하단 탭바 강조
  * - B계열: FAB 플로팅 버튼 강조
  * - C계열: 타일메뉴 variants
  * - D계열: 배달/포장 카드 강조
  */
-export function TemplatePreview({ template }: TemplatePreviewProps) {
+export function TemplatePreview({
+  template,
+  variant = 'rising',
+  scale = 1,
+}: TemplatePreviewProps) {
   const brand = template.gradient.from;
+  const isFloating = variant === 'floating';
 
   return (
     <div
-      className="relative w-[118px] h-[160px] rounded-t-[14px] bg-white border border-white/60 shadow-[0_8px_20px_rgba(0,0,0,0.18)] overflow-hidden translate-y-2"
+      className={`relative w-[118px] h-[160px] bg-white border border-white/60 shadow-[0_8px_20px_rgba(0,0,0,0.18)] overflow-hidden ${
+        isFloating ? 'rounded-[14px]' : 'rounded-t-[14px] translate-y-2'
+      }`}
+      style={scale !== 1 ? { transform: `scale(${scale})` } : undefined}
       aria-hidden
     >
       {/* Status bar */}

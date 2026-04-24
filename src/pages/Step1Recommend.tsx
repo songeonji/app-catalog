@@ -18,11 +18,17 @@ import {
   ArrowsClockwise,
   Check,
   CaretRight,
+  CaretDown,
+  Prohibit,
+  Warning,
+  Star,
 } from '@phosphor-icons/react';
 import { useAppStore } from '../store';
 import TopNav from '../components/TopNav';
 import BottomCTA from '../components/BottomCTA';
-import { allQuestions, getRecommendedTemplates } from '../data/questions';
+import { TemplatePreview } from '../components/TemplatePreview';
+import { allQuestions } from '../data/questions';
+import { getRecommendation } from '../data/recommendation';
 import { getTemplateById } from '../data/templates';
 import type { TemplateId } from '../types';
 
@@ -55,6 +61,28 @@ const sectionStyleMap: Record<string, { text: string; bg: string }> = {
   D: { text: 'text-[#7B4FD8]', bg: 'bg-[#F5F0FF]' },
 };
 
+/**
+ * 비추천 카드 타이틀에 표시할 템플릿 ID 문자열 포맷.
+ *  - 1~3종: `A-2`, `C-3 / C-4` 등 그대로 나열
+ *  - 4종 이상: 섹션별 계열로 축약 (예: "B-1 / B-2 / B-3 → B계열")
+ */
+function formatTemplateIdList(ids: TemplateId[]): string {
+  if (ids.length <= 3) return ids.join(' / ');
+  const bySection = new Map<string, TemplateId[]>();
+  for (const id of ids) {
+    const sec = id.split('-')[0];
+    if (!bySection.has(sec)) bySection.set(sec, []);
+    bySection.get(sec)!.push(id);
+  }
+  const parts: string[] = [];
+  for (const [sec, list] of bySection) {
+    // 해당 섹션 시안을 3개 이상 포함하면 "계열"로 축약
+    if (list.length >= 3) parts.push(`${sec}계열 전체`);
+    else parts.push(list.join(' / '));
+  }
+  return parts.join(', ');
+}
+
 /* ================================================================
    메인 컴포넌트
    ================================================================ */
@@ -72,6 +100,8 @@ export default function Step1Recommend() {
 
   const [currentQIndex, setCurrentQIndex] = useState(0);
   const [showResults, setShowResults] = useState(false);
+  /** 기획서 v2.1: 비추천 섹션은 기본값 펼침 */
+  const [isNotRecOpen, setIsNotRecOpen] = useState(true);
 
   /**
    * 동적 플로우:
@@ -97,8 +127,8 @@ export default function Step1Recommend() {
   const currentAnswer = recommendAnswers[currentQKey];
   const icons = getIconsForQuestion(currentQKey);
 
-  const recommendedTemplates = useMemo(
-    () => getRecommendedTemplates(recommendAnswers),
+  const recommendation = useMemo(
+    () => getRecommendation(recommendAnswers),
     [recommendAnswers],
   );
 
@@ -130,10 +160,13 @@ export default function Step1Recommend() {
 
   /* ── 추천 결과 화면 (기획서: "브랜드에 딱 맞는 시안을 찾았어요") ── */
   if (showResults) {
-    const bestId = recommendedTemplates[0];
-    const altIds = recommendedTemplates.slice(1, 3);
-    const bestTpl = bestId ? getTemplateById(bestId) : null;
-    const altTpls = altIds.map(getTemplateById).filter(Boolean);
+    const bestTpl = recommendation.primary
+      ? getTemplateById(recommendation.primary)
+      : null;
+    const altTpls = recommendation.closeRecs
+      .map(getTemplateById)
+      .filter(Boolean);
+    const notRecItems = recommendation.notRecommended;
 
     return (
       <div className="min-h-screen flex flex-col">
@@ -161,19 +194,25 @@ export default function Step1Recommend() {
             >
               {/* 헤더 배지 */}
               <div className="flex items-center gap-2 px-5 py-3 bg-primary">
-                <Check size={16} weight="bold" className="text-white" />
-                <span className="text-white text-sm font-bold">가장 잘 맞아요</span>
+                <Star size={16} weight="fill" className="text-white" />
+                <span className="text-white text-sm font-bold">
+                  가장 잘 맞아요
+                </span>
               </div>
               {/* 내용 */}
               <div className="flex gap-6 p-6 bg-white">
-                {/* 썸네일 */}
+                {/* 썸네일 — 시안별 실제 미니 UI */}
                 <div
                   className="w-40 h-[280px] rounded-lg flex items-center justify-center shrink-0"
                   style={{
                     background: `linear-gradient(135deg, ${bestTpl.gradient.from}, ${bestTpl.gradient.to})`,
                   }}
                 >
-                  <div className="w-20 h-36 bg-white/30 rounded-lg" />
+                  <TemplatePreview
+                    template={bestTpl}
+                    variant="floating"
+                    scale={1.15}
+                  />
                 </div>
                 {/* 정보 */}
                 <div className="flex flex-col gap-4 flex-1 py-1">
@@ -207,12 +246,19 @@ export default function Step1Recommend() {
             </motion.div>
           )}
 
-          {/* ── 차선 시안 (이런 점이 달라요) ── */}
+          {/* ── 근접 추천 (추천해요) ── */}
           {altTpls.length > 0 && (
             <div className="w-full max-w-[1040px] mt-6">
-              <p className="text-sm font-semibold text-text-muted mb-3 tracking-wide">
-                이런 점이 달라요
-              </p>
+              <div className="flex items-center gap-2 mb-3">
+                <CheckCircle
+                  size={16}
+                  weight="fill"
+                  className="text-primary"
+                />
+                <p className="text-sm font-bold text-text-primary tracking-wide">
+                  추천해요
+                </p>
+              </div>
               <div className="flex gap-5">
                 {altTpls.map((tpl) =>
                   tpl ? (
@@ -221,16 +267,20 @@ export default function Step1Recommend() {
                       initial={{ opacity: 0, y: 16 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.35, delay: 0.1 }}
-                      className="flex-1 rounded-xl border border-border overflow-hidden bg-white"
+                      className="flex-1 rounded-xl border border-primary/30 bg-primary-light/30 overflow-hidden"
                     >
                       <div className="flex gap-4 p-5">
                         <div
-                          className="w-20 h-[140px] rounded-lg flex items-center justify-center shrink-0"
+                          className="w-[104px] h-[140px] rounded-lg flex items-center justify-center shrink-0"
                           style={{
-                            background: `linear-gradient(135deg, ${tpl.gradient.from}44, ${tpl.gradient.to}44)`,
+                            background: `linear-gradient(135deg, ${tpl.gradient.from}33, ${tpl.gradient.to}33)`,
                           }}
                         >
-                          <div className="w-10 h-[70px] rounded-md" style={{ backgroundColor: `${tpl.gradient.from}33` }} />
+                          <TemplatePreview
+                            template={tpl}
+                            variant="floating"
+                            scale={0.75}
+                          />
                         </div>
                         <div className="flex flex-col gap-2 flex-1">
                           <div className="flex items-center gap-2">
@@ -251,9 +301,9 @@ export default function Step1Recommend() {
                           <button
                             type="button"
                             onClick={() => handleSelectAndGo(tpl.id)}
-                            className="self-start mt-1 px-5 py-2.5 rounded-lg border border-border text-sm font-semibold text-text-primary hover:border-primary/40 transition-colors"
+                            className="self-start mt-1 px-5 py-2.5 rounded-lg border border-primary/40 bg-white text-sm font-semibold text-primary hover:bg-primary hover:text-white transition-colors"
                           >
-                            선택하기
+                            이 시안으로 시작하기
                           </button>
                         </div>
                       </div>
@@ -262,6 +312,95 @@ export default function Step1Recommend() {
                 )}
               </div>
             </div>
+          )}
+
+          {/* ── 비추천 섹션 (이 시안들은 맞지 않아요, 기본값 펼침) ── */}
+          {notRecItems.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.35, delay: 0.2 }}
+              className="w-full max-w-[1040px] mt-8 rounded-xl border border-[#E85A5A]/35 bg-[#FFF7F7] overflow-hidden"
+            >
+              <button
+                type="button"
+                onClick={() => setIsNotRecOpen((v) => !v)}
+                className="w-full flex items-center justify-between px-5 py-3.5 bg-[#FEECEC] hover:bg-[#FCE0E0] transition-colors"
+                aria-expanded={isNotRecOpen}
+              >
+                <div className="flex items-center gap-2">
+                  <Prohibit
+                    size={18}
+                    weight="bold"
+                    className="text-[#C83B3B]"
+                  />
+                  <span className="text-[#9A2B2B] text-sm font-bold">
+                    이 시안들은 맞지 않아요
+                  </span>
+                  <span className="text-[#C83B3B]/70 text-xs font-medium ml-1">
+                    ({notRecItems.length}건)
+                  </span>
+                </div>
+                <CaretDown
+                  size={14}
+                  weight="bold"
+                  className={`text-[#C83B3B] transition-transform ${
+                    isNotRecOpen ? 'rotate-180' : ''
+                  }`}
+                />
+              </button>
+
+              <AnimatePresence initial={false}>
+                {isNotRecOpen && (
+                  <motion.div
+                    key="notrec-body"
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.25 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="px-5 pt-4 pb-5">
+                      <div className="flex items-start gap-2 mb-4 px-1">
+                        <Warning
+                          size={14}
+                          weight="fill"
+                          className="text-[#C83B3B] shrink-0 mt-0.5"
+                        />
+                        <p className="text-[12.5px] text-[#7A2F2F] leading-5">
+                          선택한 상권·타겟층에서 역효과가 날 수 있는 시안이에요.
+                          선택 전에 한 번 확인해 주세요.
+                        </p>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {notRecItems.map((item, idx) => (
+                          <div
+                            key={idx}
+                            className="rounded-lg bg-white border border-[#E85A5A]/30 p-4 shadow-[0_1px_0_rgba(200,59,59,0.06)]"
+                          >
+                            <div className="flex items-center gap-2 mb-2.5">
+                              <div className="w-5 h-5 rounded-full bg-[#FEECEC] flex items-center justify-center">
+                                <Prohibit
+                                  size={11}
+                                  weight="bold"
+                                  className="text-[#C83B3B]"
+                                />
+                              </div>
+                              <span className="font-['Inter'] text-[15px] font-extrabold text-[#9A2B2B] tracking-tight">
+                                {formatTemplateIdList(item.templateIds)}
+                              </span>
+                            </div>
+                            <p className="text-[13px] text-text-secondary leading-[21px]">
+                              {item.reason}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
           )}
 
           {/* ── 하단 액션 (다시 응답하기 + 전체 시안 직접 보기) ── */}
