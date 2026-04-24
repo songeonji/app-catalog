@@ -5,10 +5,9 @@ import {
   House,
   ShoppingBag,
   Car,
-  Briefcase,
-  Sparkle,
-  UsersThree,
-  Globe,
+  HeartStraight,
+  Lightning,
+  Ticket,
   Storefront,
   Truck,
   Timer,
@@ -22,6 +21,8 @@ import {
   Prohibit,
   Warning,
   Star,
+  Square,
+  CheckSquare,
 } from '@phosphor-icons/react';
 import { useAppStore } from '../store';
 import TopNav from '../components/TopNav';
@@ -36,8 +37,8 @@ type QuestionKey = 'q1' | 'q2' | 'q3' | 'q3_1';
 
 /** Q1 아이콘: 오피스, 주거, 쇼핑몰, 로드샵 */
 const Q1_ICONS = [Buildings, House, ShoppingBag, Car];
-/** Q2 아이콘: 직장인, MZ세대, 가족·중장년, 범용 */
-const Q2_ICONS = [Briefcase, Sparkle, UsersThree, Globe];
+/** Q2 아이콘: 재방문·단골(♥), 빠른주문(⚡), 이벤트(🎟) */
+const Q2_ICONS = [HeartStraight, Lightning, Ticket];
 /** Q3 아이콘: 포장만, 배달+포장 */
 const Q3_ICONS = [Storefront, Truck];
 /** Q3-1 아이콘: 첫화면선택, 주문할때선택 */
@@ -148,11 +149,20 @@ export default function Step1Recommend() {
 
   const handleRestart = () => {
     setRecommendAnswer('q1', null);
-    setRecommendAnswer('q2', null);
+    setRecommendAnswer('q2', []);
     setRecommendAnswer('q3', null);
     setRecommendAnswer('q3_1', null);
     setCurrentQIndex(0);
     setShowResults(false);
+  };
+
+  /** Q2 복수 선택 토글 */
+  const toggleQ2 = (value: number) => {
+    const current = recommendAnswers.q2;
+    const next = current.includes(value)
+      ? current.filter((v) => v !== value)
+      : [...current, value];
+    setRecommendAnswer('q2', next);
   };
 
   // 프로그레스 표시용 (1-based, 가변 단계)
@@ -480,20 +490,43 @@ export default function Step1Recommend() {
             transition={{ duration: 0.25 }}
             className="w-full max-w-[960px]"
           >
-            <h2 className="text-xl font-bold text-text-primary mb-5 leading-7">
+            <h2 className="text-xl font-bold text-text-primary mb-2 leading-7">
               Q{currentQIndex + 1}. {currentQuestion.title}
             </h2>
+            {currentQuestion.subtitle && (
+              <p className="text-sm text-text-muted mb-5">
+                {currentQuestion.subtitle}
+              </p>
+            )}
+            {!currentQuestion.subtitle && <div className="mb-5" />}
 
             <div className="flex flex-col gap-3">
               {currentQuestion.options.map((option, idx) => {
-                const isSelected = currentAnswer === option.value;
+                const isMulti = currentQKey === 'q2';
+                const q2Set = isMulti
+                  ? (recommendAnswers.q2 as number[])
+                  : [];
+                const isSelected = isMulti
+                  ? q2Set.includes(option.value)
+                  : currentAnswer === option.value;
                 const Icon = icons[idx] || Circle;
+
+                const handleClick = () => {
+                  if (isMulti) {
+                    toggleQ2(option.value);
+                  } else {
+                    setRecommendAnswer(
+                      currentQKey as 'q1' | 'q3' | 'q3_1',
+                      option.value,
+                    );
+                  }
+                };
 
                 return (
                   <button
                     key={option.value}
                     type="button"
-                    onClick={() => setRecommendAnswer(currentQKey, option.value)}
+                    onClick={handleClick}
                     className={`flex items-center gap-4 px-6 py-[18px] rounded-xl border-[1.5px] transition-all text-left ${
                       isSelected
                         ? 'bg-primary-light border-primary'
@@ -524,8 +557,22 @@ export default function Step1Recommend() {
                     </div>
 
                     <div className="shrink-0">
-                      {isSelected ? (
-                        <CheckCircle size={24} weight="fill" className="text-primary" />
+                      {isMulti ? (
+                        isSelected ? (
+                          <CheckSquare
+                            size={24}
+                            weight="fill"
+                            className="text-primary"
+                          />
+                        ) : (
+                          <Square size={24} className="text-border" />
+                        )
+                      ) : isSelected ? (
+                        <CheckCircle
+                          size={24}
+                          weight="fill"
+                          className="text-primary"
+                        />
                       ) : (
                         <Circle size={24} className="text-border" />
                       )}
@@ -549,7 +596,10 @@ export default function Step1Recommend() {
           </button>
         }
         primaryLabel="다음 질문"
-        primaryDisabled={currentAnswer === null}
+        primaryDisabled={
+          // Q2(복수 선택)는 아무것도 선택 안 해도 "그냥 다음으로" 진행 가능
+          currentQKey === 'q2' ? false : currentAnswer === null
+        }
         onPrimaryClick={handleNext}
       />
     </div>

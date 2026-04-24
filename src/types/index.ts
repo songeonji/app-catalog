@@ -8,7 +8,6 @@ export type TemplateId =
   | 'B-3'
   | 'C-1'
   | 'C-2'
-  | 'C-3'
   | 'C-4'
   | 'D-1'
   | 'D-2';
@@ -54,7 +53,8 @@ export interface CustomizeState {
 
 export interface RecommendAnswer {
   q1: number | null;
-  q2: number | null;
+  /** Q2는 복수 선택 (기획서 v2.1). 빈 배열 = 아무것도 해당 없음. */
+  q2: number[];
   q3: number | null;
   q3_1: number | null;
 }

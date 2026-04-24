@@ -27,7 +27,10 @@ interface AppState {
   setQuickMenuOrder: (order: string[]) => void;
   setFabIconUrl: (url: string | null) => void;
   setActiveScreen: (screen: ScreenTab) => void;
-  setRecommendAnswer: (key: keyof RecommendAnswer, value: number | null) => void;
+  setRecommendAnswer: <K extends keyof RecommendAnswer>(
+    key: K,
+    value: RecommendAnswer[K],
+  ) => void;
   resetCustomize: () => void;
   getShareUrl: () => string;
 }
@@ -45,7 +48,7 @@ const defaultCustomize: CustomizeState = {
 
 const defaultAnswers: RecommendAnswer = {
   q1: null,
-  q2: null,
+  q2: [],
   q3: null,
   q3_1: null,
 };

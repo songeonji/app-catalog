@@ -91,15 +91,6 @@ export const templates: Template[] = [
     gradient: { from: '#3DB86A', to: '#50C878' },
   },
   {
-    id: 'C-3',
-    section: 'C',
-    name: '5열 소형 타일',
-    type: '타일메뉴형',
-    description: '5열 소형 타일로 많은 메뉴를 컴팩트하게 배치',
-    recommendation: '기능이 많은 앱, 편의점/마트',
-    gradient: { from: '#2DA85C', to: '#50C878' },
-  },
-  {
     id: 'C-4',
     section: 'C',
     name: '2행 격자 타일',

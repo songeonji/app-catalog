@@ -1,4 +1,4 @@
-import type { TemplateId, RecommendAnswer } from '../types';
+import type { TemplateId } from '../types';
 
 export interface QuestionOption {
   label: string;
@@ -11,6 +11,8 @@ export interface Question {
   id: string;
   title: string;
   subtitle?: string;
+  /** 기획서 v2.1 — Q2는 복수 선택. 나머지는 단일 선택. */
+  multi?: boolean;
   options: QuestionOption[];
 }
 
@@ -39,7 +41,7 @@ export const q1: Question = {
       label: '쇼핑몰·번화가',
       value: 2,
       description: '신규 고객 비율 높음, 이벤트·브랜드 노출 중요',
-      templates: ['A-2', 'C-3', 'C-4'],
+      templates: ['A-2', 'C-4'],
     },
     {
       label: '로드샵·외곽',
@@ -51,43 +53,40 @@ export const q1: Question = {
 };
 
 /**
- * Q2. 주 고객층은 누구인가요?
- * (Q1 = 로드샵·외곽 선택 시 스킵)
+ * Q2. 매장에 대해 해당하는 항목을 모두 선택해주세요. (복수 선택 가능, 기획서 v2.1)
+ * (Q1 = 로드샵·외곽 선택 시 스킵 / 아무것도 해당 없으면 그냥 다음으로)
+ *   value 0 = A (단골), 1 = B (빠른주문), 2 = C (이벤트)
  */
 export const q2: Question = {
   id: 'q2',
-  title: '주 고객층은 누구인가요?',
+  title: '매장에 대해 해당하는 항목을 모두 선택해주세요',
+  subtitle: '복수 선택 가능, 해당사항이 없다면 그냥 넘어가셔도 돼요.',
+  multi: true,
   options: [
     {
-      label: '직장인 (30~40대)',
+      label: '재방문·단골 고객이 많은 편이에요',
       value: 0,
-      description: '빠른 주문·재주문, 기능 단순 선호',
+      description: '멤버십·스탬프를 홈에서 바로 확인할 수 있는 구성',
+      templates: ['A-1', 'A-2', 'B-2', 'B-3'],
+    },
+    {
+      label: '점심시간처럼 짧은 시간에 주문이 몰려요',
+      value: 1,
+      description: '주문 버튼이 항상 떠있거나 첫 화면에서 바로 진입 가능한 구성',
       templates: ['B-1', 'B-2', 'C-2'],
     },
     {
-      label: 'MZ세대 (20~30대)',
-      value: 1,
-      description: '스탬프·쿠폰 등 혜택에 민감, 이벤트 참여 활발',
-      templates: ['A-2', 'C-3', 'C-4'],
-    },
-    {
-      label: '가족·중장년 (40대 이상)',
+      label: '쿠폰·이벤트를 앱에서 적극적으로 운영할 예정이에요',
       value: 2,
-      description: '단순한 구성, 멤버십 카드·바코드 선호',
-      templates: ['B-3', 'C-1'],
-    },
-    {
-      label: '특정 타겟 없음',
-      value: 3,
-      description: '범용 구성',
-      templates: ['A-1', 'B-1'],
+      description: '이벤트 배너·쿠폰 동선이 강조된 구성',
+      templates: ['A-2', 'C-4'],
     },
   ],
 };
 
 /**
  * Q3. 배달 서비스를 운영하시나요?
- * - 아니요: Q1·Q2 교집합 결과 유지, D계열 제외
+ * - 아니요: Q1·Q2 결과 유지, D계열 제외
  * - 예: Q1·Q2 결과 무관하게 D계열로 강제 → Q3-1 분기
  */
 export const q3: Question = {
@@ -128,55 +127,3 @@ export const q3_1: Question = {
 };
 
 export const allQuestions = { q1, q2, q3, q3_1 };
-
-/**
- * 추천 로직 (기획서 v2.0 기준)
- * - Q3 = 예: D계열 강제 (Q3-1 응답에 따라 D-1/D-2 우선 정렬)
- * - Q3 = 아니요: Q1·Q2 교집합 유지, D계열 제외
- * - Q3 미응답: Q1·Q2 교집합 (D계열 포함 가능)
- * - Q2 스킵(Q1 = 로드샵·외곽): Q1 결과만 사용
- */
-export function getRecommendedTemplates(answers: RecommendAnswer): TemplateId[] {
-  // Q3 = 예: D계열 강제 전환
-  if (answers.q3 === 1) {
-    if (answers.q3_1 === 0) return ['D-1', 'D-2'];
-    if (answers.q3_1 === 1) return ['D-2', 'D-1'];
-    return ['D-1', 'D-2'];
-  }
-
-  const q1Templates =
-    answers.q1 !== null ? q1.options[answers.q1]?.templates ?? [] : [];
-  const q2Templates =
-    answers.q2 !== null ? q2.options[answers.q2]?.templates ?? [] : [];
-
-  let recommended: TemplateId[] = [];
-
-  if (q1Templates.length > 0 && q2Templates.length > 0) {
-    // 교집합 우선
-    const intersection = q1Templates.filter((id) => q2Templates.includes(id));
-    recommended = [...intersection];
-    // 차순위로 Q1 → Q2 순서로 합집합 보강
-    for (const id of q1Templates) {
-      if (!recommended.includes(id)) recommended.push(id);
-    }
-    for (const id of q2Templates) {
-      if (!recommended.includes(id)) recommended.push(id);
-    }
-  } else if (q1Templates.length > 0) {
-    recommended = [...q1Templates];
-  } else if (q2Templates.length > 0) {
-    recommended = [...q2Templates];
-  } else {
-    recommended = ['A-1', 'B-1', 'B-2'];
-  }
-
-  // Q3 = 아니요: D계열 제외
-  if (answers.q3 === 0) {
-    recommended = recommended.filter((id) => id !== 'D-1' && id !== 'D-2');
-    if (recommended.length === 0) {
-      recommended = ['A-1', 'B-1'];
-    }
-  }
-
-  return recommended;
-}

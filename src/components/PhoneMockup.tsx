@@ -851,41 +851,6 @@ function TemplateC2({ brandColor, brandName, bannerRatio, showHeaderBI, headerLo
   );
 }
 
-/* C-3: 타일메뉴형 - 5열 소형 */
-function TemplateC3({ brandColor, brandName, bannerRatio, showHeaderBI, headerLogoUrl, fabIconUrl: _fabIconUrl, quickMenuOrder, onScreenChange: _onScreenChange }: TemplateProps) {
-  return (
-    <>
-      <StatusBar />
-      <Header variant="hamburger" brandColor={brandColor} brandName={brandName} showHeaderBI={showHeaderBI} headerLogoUrl={headerLogoUrl} />
-      <div className="flex-1 overflow-y-auto phone-scroll">
-        <Greeting prefix="환영합니다" name="코코넛님!" />
-        <div className="mt-2">
-          <Banner brandColor={brandColor} bannerRatio={bannerRatio} />
-        </div>
-        {/* 5 small circle icon tiles */}
-        <div className="grid grid-cols-5 gap-1 px-4 mt-4">
-          {(quickMenuOrder.length > 0 ? quickMenuOrder : ['주문', '주문내역', '스탬프', '공지', '선불카드']).map((feat) => {
-            const Icon = FEATURE_ICON_MAP[feat] || CreditCard;
-            return (
-              <div key={feat} className="flex flex-col items-center gap-1">
-                <div
-                  className="w-10 h-10 rounded-full flex items-center justify-center"
-                  style={{ backgroundColor: hexAlpha(brandColor, 0.1) }}
-                >
-                  <Icon size={18} style={{ color: brandColor }} />
-                </div>
-                <span className="text-[9px] text-text-secondary">{feat}</span>
-              </div>
-            );
-          })}
-        </div>
-        <MenuSection variant="vertical" />
-        <div className="h-4" />
-      </div>
-    </>
-  );
-}
-
 /* C-4: 타일메뉴형 - 2행 격자 */
 function TemplateC4({ brandColor, brandName, bannerRatio, showHeaderBI, headerLogoUrl, fabIconUrl: _fabIconUrl, quickMenuOrder, onScreenChange: _onScreenChange }: TemplateProps) {
   return (
@@ -1049,8 +1014,6 @@ export function PhoneMockup({
         return <TemplateC1 {...common} />;
       case 'C-2':
         return <TemplateC2 {...common} />;
-      case 'C-3':
-        return <TemplateC3 {...common} />;
       case 'C-4':
         return <TemplateC4 {...common} />;
       case 'D-1':

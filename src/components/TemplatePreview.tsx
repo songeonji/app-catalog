@@ -68,8 +68,6 @@ function renderTemplateBody(id: TemplateId, brand: string) {
       return <PreviewC1 brand={brand} />;
     case 'C-2':
       return <PreviewC2 brand={brand} />;
-    case 'C-3':
-      return <PreviewC3 brand={brand} />;
     case 'C-4':
       return <PreviewC4 brand={brand} />;
     case 'D-1':
@@ -391,37 +389,6 @@ function PreviewC2({ brand }: { brand: string }) {
           </div>
         ))}
       </div>
-    </>
-  );
-}
-
-function PreviewC3({ brand }: { brand: string }) {
-  // 5열 소형 타일
-  return (
-    <>
-      <TopBar brand={brand} />
-      <div
-        className="h-5 rounded-md mb-1"
-        style={{
-          background: `linear-gradient(90deg, ${brand}60, ${brand}30)`,
-        }}
-      />
-      {Array.from({ length: 3 }).map((_, row) => (
-        <div key={row} className="grid grid-cols-5 gap-[3px] mb-1">
-          {Array.from({ length: 5 }).map((_, col) => (
-            <div
-              key={col}
-              className="flex flex-col items-center gap-[1px]"
-            >
-              <div
-                className="w-full aspect-square rounded"
-                style={{ backgroundColor: `${brand}20` }}
-              />
-              <div className="h-[1.5px] w-3 rounded-full bg-gray-300" />
-            </div>
-          ))}
-        </div>
-      ))}
     </>
   );
 }
