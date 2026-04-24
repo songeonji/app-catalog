@@ -1,13 +1,14 @@
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Image,
-  Medal,
-  CreditCard,
+  Buildings,
+  House,
   ShoppingBag,
-  ShoppingCart,
-  Star,
-  Shapes,
+  Car,
+  Briefcase,
+  Sparkle,
+  UsersThree,
+  Globe,
   Storefront,
   Truck,
   Timer,
@@ -27,12 +28,10 @@ import type { TemplateId } from '../types';
 
 type QuestionKey = 'q1' | 'q2' | 'q3' | 'q3_1';
 
-const QUESTION_FLOW: QuestionKey[] = ['q1', 'q2', 'q3'];
-
-/** Q1 아이콘: 브랜드이미지, 스탬프·쿠폰, 멤버십카드, 주문유형 */
-const Q1_ICONS = [Image, Medal, CreditCard, ShoppingBag];
-/** Q2 아이콘: 주문핵심, 주문+스탬프, 다양한기능 */
-const Q2_ICONS = [ShoppingCart, Star, Shapes];
+/** Q1 아이콘: 오피스, 주거, 쇼핑몰, 로드샵 */
+const Q1_ICONS = [Buildings, House, ShoppingBag, Car];
+/** Q2 아이콘: 직장인, MZ세대, 가족·중장년, 범용 */
+const Q2_ICONS = [Briefcase, Sparkle, UsersThree, Globe];
 /** Q3 아이콘: 포장만, 배달+포장 */
 const Q3_ICONS = [Storefront, Truck];
 /** Q3-1 아이콘: 첫화면선택, 주문할때선택 */
@@ -74,14 +73,23 @@ export default function Step1Recommend() {
   const [currentQIndex, setCurrentQIndex] = useState(0);
   const [showResults, setShowResults] = useState(false);
 
-  /* Q3 == 1("네, 배달+포장") 이면 Q3-1 추가 */
+  /**
+   * 동적 플로우:
+   *  - 기본: Q1 → Q2 → Q3
+   *  - Q1 = 로드샵·외곽(value 3): Q2 스킵 → Q1 → Q3
+   *  - Q3 = 예(value 1): 끝에 Q3-1 추가
+   */
   const effectiveFlow = useMemo(() => {
-    const flow: QuestionKey[] = [...QUESTION_FLOW];
+    const flow: QuestionKey[] = ['q1'];
+    if (recommendAnswers.q1 !== 3) {
+      flow.push('q2');
+    }
+    flow.push('q3');
     if (recommendAnswers.q3 === 1) {
       flow.push('q3_1');
     }
     return flow;
-  }, [recommendAnswers.q3]);
+  }, [recommendAnswers.q1, recommendAnswers.q3]);
 
   const totalSteps = effectiveFlow.length;
   const currentQKey = effectiveFlow[currentQIndex];
@@ -117,8 +125,8 @@ export default function Step1Recommend() {
     setShowResults(false);
   };
 
-  // 프로그레스 표시용 (1‑based, 최대 3)
-  const displayStep = Math.min(currentQIndex + 1, 3);
+  // 프로그레스 표시용 (1-based, 가변 단계)
+  const displayStep = currentQIndex + 1;
 
   /* ── 추천 결과 화면 (기획서: "브랜드에 딱 맞는 시안을 찾았어요") ── */
   if (showResults) {
@@ -290,34 +298,37 @@ export default function Step1Recommend() {
           STEP 01
         </span>
         <h1 className="text-4xl font-extrabold text-text-primary mt-3 tracking-tight leading-[44px]">
-          어떤 앱 경험을 만들고 싶으신가요?
+          매장 정보를 알려주세요
         </h1>
         <p className="text-text-muted mt-3 text-base">
-          몇 가지 질문에 답하면 브랜드에 맞는 시안을 추천해드려요.
+          상권과 주 고객층을 알려주시면 가장 잘 맞는 시안을 추천해드려요.
         </p>
 
-        {/* 프로그레스 */}
+        {/* 프로그레스 (가변 단계) */}
         <div className="flex items-center mt-10 mb-10">
-          {[1, 2, 3].map((n, idx) => (
-            <div key={n} className="flex items-center">
-              {idx > 0 && (
+          {Array.from({ length: totalSteps }).map((_, idx) => {
+            const n = idx + 1;
+            return (
+              <div key={n} className="flex items-center">
+                {idx > 0 && (
+                  <div
+                    className={`w-[120px] h-[2px] ${
+                      displayStep > idx ? 'bg-primary' : 'bg-border'
+                    }`}
+                  />
+                )}
                 <div
-                  className={`w-[140px] h-[2px] ${
-                    displayStep > idx ? 'bg-primary' : 'bg-border'
+                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-colors ${
+                    displayStep >= n
+                      ? 'bg-primary text-white'
+                      : 'bg-warm-white border-[1.5px] border-border text-text-disabled'
                   }`}
-                />
-              )}
-              <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-colors ${
-                  displayStep >= n
-                    ? 'bg-primary text-white'
-                    : 'bg-warm-white border-[1.5px] border-border text-text-disabled'
-                }`}
-              >
-                {displayStep > n ? <Check size={14} weight="bold" /> : n}
+                >
+                  {displayStep > n ? <Check size={14} weight="bold" /> : n}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* 질문 카드 */}
@@ -363,16 +374,12 @@ export default function Step1Recommend() {
                     </div>
 
                     <div className="flex-1 min-w-0">
-                      <p
-                        className={`text-base font-semibold leading-6 ${
-                          isSelected ? 'text-text-primary' : 'text-text-primary'
-                        }`}
-                      >
+                      <p className="text-base font-semibold leading-6 text-text-primary">
                         {option.label}
                       </p>
-                      {option.templates.length > 0 && (
+                      {option.description && (
                         <p className="text-[13px] text-text-muted mt-0.5">
-                          연결 시안: {option.templates.join(', ')}
+                          {option.description}
                         </p>
                       )}
                     </div>
