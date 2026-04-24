@@ -1,6 +1,7 @@
 import { Check, Star } from '@phosphor-icons/react';
 import { motion } from 'framer-motion';
 import type { Template, SectionId } from '../types';
+import { TemplatePreview } from './TemplatePreview';
 
 interface TemplateCardProps {
   template: Template;
@@ -57,8 +58,8 @@ export function TemplateCard({
           background: `linear-gradient(135deg, ${template.gradient.from}, ${template.gradient.to})`,
         }}
       >
-        {/* Phone silhouette placeholder */}
-        <div className="w-24 h-36 bg-white/20 rounded-t-xl backdrop-blur-sm border border-white/30 mb-0 translate-y-2" />
+        {/* Mini phone preview */}
+        <TemplatePreview template={template} />
       </div>
 
       {/* Content area */}
