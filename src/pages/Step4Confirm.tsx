@@ -386,6 +386,10 @@ export default function Step4Confirm() {
                     </div>
                     <button type="button" onClick={handleSendToManager}
                       disabled={sending || !localBrandName.trim() || sendStatus === 'sent'}
+                      data-ga-event="share"
+                      data-ga-param-method="manager"
+                      data-ga-param-content-type="template"
+                      data-ga-param-item-id={customize.templateId || '-'}
                       className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg bg-dark text-white text-sm font-bold hover:bg-dark-hover transition-colors disabled:opacity-40"
                     >
                       {sending ? <Spinner size={16} className="animate-spin" /> : sendStatus === 'sent' ? <Check size={16} weight="bold" /> : <PaperPlaneTilt size={16} weight="fill" />}

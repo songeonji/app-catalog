@@ -213,6 +213,12 @@ export default function Step3Interaction() {
         onPrimaryClick={handleConfirm}
         secondaryLabel="커스터마이즈로 돌아가기"
         onSecondaryClick={handleBack}
+        primaryDataAttrs={{
+          'data-ga-event': 'select_content',
+          'data-ga-param-content-type': 'step_progress',
+          'data-ga-param-item-id': 'step3_to_step4',
+          'data-ga-param-item-category': 'bottom_cta',
+        }}
         leftContent={
           <button
             type="button"

@@ -633,6 +633,10 @@ export default function Step2Customize() {
             <button
               type="button"
               onClick={handleGoInteraction}
+              data-ga-event="select_content"
+              data-ga-param-content-type="step_progress"
+              data-ga-param-item-id="step2_to_step3"
+              data-ga-param-item-category="bottom_cta"
               className="flex items-center justify-center gap-1.5 w-full py-2.5 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-primary-hover transition-colors"
             >
               인터랙션 체험하기

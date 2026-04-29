@@ -84,12 +84,20 @@ export default function Step1Gallery() {
                 <SectionHeader section={section} />
                 <div className={`grid ${gridCols} gap-5 mt-4`}>
                   {sectionTemplates.map((tpl) => (
-                    <TemplateCard
+                    <div
                       key={tpl.id}
-                      template={tpl}
-                      selected={customize.templateId === tpl.id}
-                      onClick={() => handleSelectTemplate(tpl.id)}
-                    />
+                      data-ga-event="select_content"
+                      data-ga-param-content-type="template"
+                      data-ga-param-item-id={tpl.id}
+                      data-ga-param-item-name={tpl.name}
+                      data-ga-param-item-category="gallery"
+                    >
+                      <TemplateCard
+                        template={tpl}
+                        selected={customize.templateId === tpl.id}
+                        onClick={() => handleSelectTemplate(tpl.id)}
+                      />
+                    </div>
                   ))}
                 </div>
               </motion.section>
@@ -112,6 +120,12 @@ export default function Step1Gallery() {
         primaryLabel="커스터마이즈 시작"
         primaryDisabled={!customize.templateId}
         onPrimaryClick={handleStart}
+        primaryDataAttrs={{
+          'data-ga-event': 'select_content',
+          'data-ga-param-content-type': 'step_progress',
+          'data-ga-param-item-id': 'step1_to_step2',
+          'data-ga-param-item-category': 'bottom_cta',
+        }}
       />
     </div>
   );

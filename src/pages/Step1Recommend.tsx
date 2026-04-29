@@ -255,6 +255,11 @@ export default function Step1Recommend() {
                     <button
                       type="button"
                       onClick={() => handleSelectAndGo(bestTpl.id)}
+                      data-ga-event="select_content"
+                      data-ga-param-content-type="template"
+                      data-ga-param-item-id={bestTpl.id}
+                      data-ga-param-item-name={bestTpl.name}
+                      data-ga-param-item-category="recommend_primary"
                       className="flex items-center gap-1.5 px-7 py-3 rounded-lg bg-dark text-white text-[15px] font-semibold hover:bg-dark-hover transition-colors"
                     >
                       이 시안으로 시작하기
@@ -321,6 +326,11 @@ export default function Step1Recommend() {
                           <button
                             type="button"
                             onClick={() => handleSelectAndGo(tpl.id)}
+                            data-ga-event="select_content"
+                            data-ga-param-content-type="template"
+                            data-ga-param-item-id={tpl.id}
+                            data-ga-param-item-name={tpl.name}
+                            data-ga-param-item-category="recommend_close"
                             className="self-start mt-1 px-5 py-2.5 rounded-lg border border-primary/40 bg-white text-sm font-semibold text-primary hover:bg-primary hover:text-white transition-colors"
                           >
                             이 시안으로 시작하기

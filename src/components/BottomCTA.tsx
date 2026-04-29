@@ -9,6 +9,8 @@ interface BottomCTAProps {
   onPrimaryClick: () => void;
   secondaryLabel?: string;
   onSecondaryClick?: () => void;
+  /** Primary 버튼에 그대로 전달될 data-* 속성 (GA4 위임 트래킹용) */
+  primaryDataAttrs?: Record<string, string>;
 }
 
 export function BottomCTA({
@@ -19,6 +21,7 @@ export function BottomCTA({
   onPrimaryClick,
   secondaryLabel,
   onSecondaryClick,
+  primaryDataAttrs,
 }: BottomCTAProps) {
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-between bg-white border-t border-border px-10 py-4">
@@ -43,6 +46,7 @@ export function BottomCTA({
           type="button"
           disabled={primaryDisabled}
           onClick={onPrimaryClick}
+          {...(primaryDataAttrs ?? {})}
           className={`flex items-center gap-2 rounded-lg px-7 py-3 text-sm font-medium text-white transition-colors ${
             primaryDisabled
               ? 'bg-text-disabled cursor-not-allowed'
