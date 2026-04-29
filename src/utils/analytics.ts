@@ -45,6 +45,23 @@ function datasetKeyToParam(key: string): string {
     .replace(/[A-Z]/g, (c) => '_' + c.toLowerCase());
 }
 
+/**
+ * 수동 발송 helper.
+ * onBlur(컬러피커), drag end(기능 정렬) 등 클릭 위임이 안 닿는 곳에서 사용.
+ *
+ *   trackEvent('select_content', {
+ *     content_type: 'customize_setting',
+ *     item_id: 'brand_color',
+ *   });
+ */
+export function trackEvent(
+  eventName: string,
+  params: Record<string, unknown> = {},
+): void {
+  if (typeof window === 'undefined') return;
+  window.gtag?.('event', eventName, params);
+}
+
 export function initGA4Delegation(): void {
   if (typeof document === 'undefined') return;
 

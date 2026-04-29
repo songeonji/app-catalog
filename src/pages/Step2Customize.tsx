@@ -14,6 +14,7 @@ import { useAppStore } from '../store';
 import TopNav from '../components/TopNav';
 import PhoneMockup from '../components/PhoneMockup';
 import { getTemplateById, sectionColors } from '../data/templates';
+import { trackEvent } from '../utils/analytics';
 import type { BannerRatio, TemplateId } from '../types';
 
 const BANNER_RATIOS: BannerRatio[] = ['2:1', '3:2', '1:1', '3:4'];
@@ -286,6 +287,10 @@ export default function Step2Customize() {
   const handleDragEnd = () => {
     setDragIdx(null);
     syncQuickMenuOrder(selectedFeatures);
+    trackEvent('select_content', {
+      content_type: 'customize_setting',
+      item_id: 'feature_reorder',
+    });
   };
 
   const handleReset = useCallback(() => {
@@ -359,6 +364,12 @@ export default function Step2Customize() {
                     type="color"
                     value={customize.brandColor}
                     onChange={(e) => setBrandColor(e.target.value)}
+                    onBlur={() =>
+                      trackEvent('select_content', {
+                        content_type: 'customize_setting',
+                        item_id: 'brand_color',
+                      })
+                    }
                     className="absolute inset-0 opacity-0 cursor-pointer"
                   />
                 </div>
@@ -368,6 +379,12 @@ export default function Step2Customize() {
                     type="text"
                     value={customize.brandColor}
                     onChange={handleColorChange}
+                    onBlur={() =>
+                      trackEvent('select_content', {
+                        content_type: 'customize_setting',
+                        item_id: 'brand_color',
+                      })
+                    }
                     maxLength={7}
                     className="text-xs font-mono text-text-muted w-20 focus:outline-none"
                   />
@@ -387,6 +404,9 @@ export default function Step2Customize() {
                 <button
                   type="button"
                   onClick={handleToggleBI}
+                  data-ga-event="select_content"
+                  data-ga-param-content-type="customize_setting"
+                  data-ga-param-item-id="header_bi_toggle"
                   className={`relative w-10 h-5 rounded-full transition-colors ${
                     isHeaderVisible ? 'bg-primary' : 'bg-border'
                   }`}
@@ -417,6 +437,9 @@ export default function Step2Customize() {
                       <button
                         type="button"
                         onClick={() => setHeaderBI({ type: 'image', url: null })}
+                        data-ga-event="select_content"
+                        data-ga-param-content-type="customize_setting"
+                        data-ga-param-item-id="header_bi_remove"
                         className="absolute top-1 right-1 w-5 h-5 rounded-full bg-white border border-border flex items-center justify-center hover:bg-red-50 transition-colors"
                       >
                         <Trash size={10} className="text-text-muted" />
@@ -426,6 +449,9 @@ export default function Step2Customize() {
                     <button
                       type="button"
                       onClick={() => logoInputRef.current?.click()}
+                      data-ga-event="select_content"
+                      data-ga-param-content-type="customize_setting"
+                      data-ga-param-item-id="header_bi_upload"
                       className="w-full h-12 border-2 border-dashed border-border rounded-lg bg-warm-white flex items-center justify-center gap-1.5 hover:border-primary/40 transition-colors"
                     >
                       <ImageSquare size={16} className="text-text-disabled" />
@@ -450,6 +476,9 @@ export default function Step2Customize() {
                     key={ratio}
                     type="button"
                     onClick={() => setBannerRatio(ratio)}
+                    data-ga-event="select_content"
+                    data-ga-param-content-type="customize_setting"
+                    data-ga-param-item-id={`banner_ratio_${ratio}`}
                     className={`py-1.5 rounded-md text-xs font-semibold transition-colors ${
                       customize.bannerRatio === ratio
                         ? 'bg-primary text-white'
@@ -511,6 +540,9 @@ export default function Step2Customize() {
                     <button
                       type="button"
                       onClick={() => handleFeatureToggle(item)}
+                      data-ga-event="select_content"
+                      data-ga-param-content-type="customize_setting"
+                      data-ga-param-item-id={`feature_remove_${item}`}
                       className="text-[10px] text-text-muted hover:text-red-400 transition-colors"
                     >
                       제거
@@ -528,6 +560,9 @@ export default function Step2Customize() {
                           key={feature}
                           type="button"
                           onClick={() => handleFeatureToggle(feature)}
+                          data-ga-event="select_content"
+                          data-ga-param-content-type="customize_setting"
+                          data-ga-param-item-id={`feature_add_${feature}`}
                           className="px-2.5 py-1 rounded-md border border-dashed border-border text-[11px] text-text-muted hover:border-primary hover:text-primary transition-colors"
                         >
                           + {feature}
@@ -565,6 +600,9 @@ export default function Step2Customize() {
                       <button
                         type="button"
                         onClick={() => setFabIconUrl(null)}
+                        data-ga-event="select_content"
+                        data-ga-param-content-type="customize_setting"
+                        data-ga-param-item-id="fab_icon_remove"
                         className="w-6 h-6 rounded-full border border-border flex items-center justify-center hover:bg-red-50 transition-colors"
                       >
                         <Trash size={12} className="text-text-muted" />
@@ -584,6 +622,9 @@ export default function Step2Customize() {
                   <button
                     type="button"
                     onClick={() => fabInputRef.current?.click()}
+                    data-ga-event="select_content"
+                    data-ga-param-content-type="customize_setting"
+                    data-ga-param-item-id="fab_icon_upload"
                     className="w-full py-2 rounded-lg border border-border text-xs text-text-secondary hover:bg-warm-white transition-colors"
                   >
                     이미지 {customize.fabIconUrl ? '변경' : '업로드'}
@@ -610,6 +651,9 @@ export default function Step2Customize() {
                   <button
                     type="button"
                     onClick={() => orderIconInputRef.current?.click()}
+                    data-ga-event="select_content"
+                    data-ga-param-content-type="customize_setting"
+                    data-ga-param-item-id="order_icon_upload"
                     className="w-full h-14 border-2 border-dashed border-border rounded-lg bg-warm-white flex items-center justify-center gap-1.5 hover:border-primary/40 transition-colors"
                   >
                     <UploadSimple size={16} className="text-text-disabled" />
@@ -625,6 +669,9 @@ export default function Step2Customize() {
             <button
               type="button"
               onClick={handleReset}
+              data-ga-event="select_content"
+              data-ga-param-content-type="restart"
+              data-ga-param-item-id="customize_reset"
               className="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg border border-border text-sm font-medium text-text-secondary hover:bg-warm-white transition-colors"
             >
               <ArrowCounterClockwise size={16} />
@@ -706,6 +753,10 @@ export default function Step2Customize() {
                     key={chip.id}
                     type="button"
                     onClick={() => handleTemplateSwitch(chip.id)}
+                    data-ga-event="select_content"
+                    data-ga-param-content-type="template"
+                    data-ga-param-item-id={chip.id}
+                    data-ga-param-item-category="template_chip"
                     className={`flex items-center gap-2 rounded-full transition-all ${
                       rightPanelOpen ? 'px-3 py-1.5 w-full' : 'w-10 h-10 justify-center'
                     } ${

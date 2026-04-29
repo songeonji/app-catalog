@@ -547,6 +547,10 @@ export default function Step1Recommend() {
                     key={option.value}
                     type="button"
                     onClick={handleClick}
+                    data-ga-event="select_content"
+                    data-ga-param-content-type="recommend_answer"
+                    data-ga-param-item-id={`${currentQKey}_${option.value}`}
+                    data-ga-param-item-name={option.label}
                     className={`flex items-center gap-4 px-6 py-[18px] rounded-xl border-[1.5px] transition-all text-left ${
                       isSelected
                         ? 'bg-primary-light border-primary'
