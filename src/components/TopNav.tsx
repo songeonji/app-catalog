@@ -39,6 +39,14 @@ export function TopNav({ currentStep, completedSteps }: TopNavProps) {
               <button
                 type="button"
                 disabled={isLocked}
+                {...(isCompleted
+                  ? {
+                      'data-ga-event': 'select_content',
+                      'data-ga-param-content-type': 'step_back',
+                      'data-ga-param-item-id': `breadcrumb_to_step${step}`,
+                      'data-ga-param-item-category': 'breadcrumb',
+                    }
+                  : {})}
                 className={`flex items-center gap-1 text-sm transition-colors ${
                   isCompleted
                     ? 'text-primary cursor-pointer hover:underline'

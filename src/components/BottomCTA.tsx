@@ -11,6 +11,8 @@ interface BottomCTAProps {
   onSecondaryClick?: () => void;
   /** Primary 버튼에 그대로 전달될 data-* 속성 (GA4 위임 트래킹용) */
   primaryDataAttrs?: Record<string, string>;
+  /** Secondary 버튼에 그대로 전달될 data-* 속성 */
+  secondaryDataAttrs?: Record<string, string>;
 }
 
 export function BottomCTA({
@@ -22,6 +24,7 @@ export function BottomCTA({
   secondaryLabel,
   onSecondaryClick,
   primaryDataAttrs,
+  secondaryDataAttrs,
 }: BottomCTAProps) {
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-between bg-white border-t border-border px-10 py-4">
@@ -36,6 +39,7 @@ export function BottomCTA({
           <button
             type="button"
             onClick={onSecondaryClick}
+            {...(secondaryDataAttrs ?? {})}
             className="border border-border rounded-lg px-7 py-3 text-sm font-medium text-text-primary transition-colors hover:bg-warm-white"
           >
             {secondaryLabel}

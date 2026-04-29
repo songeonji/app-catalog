@@ -31,6 +31,7 @@ import { TemplatePreview } from '../components/TemplatePreview';
 import { allQuestions } from '../data/questions';
 import { getRecommendation } from '../data/recommendation';
 import { getTemplateById } from '../data/templates';
+import { trackEvent } from '../utils/analytics';
 import type { TemplateId } from '../types';
 
 type QuestionKey = 'q1' | 'q2' | 'q3' | 'q3_1';
@@ -142,6 +143,25 @@ export default function Step1Recommend() {
     window.history.pushState({}, '', path);
     document.title = title;
   }, [showResults]);
+
+  /** GA4 view_item: 결과 화면 진입 시 추천 시안 카드별 노출 1회 발송 */
+  useEffect(() => {
+    if (!showResults) return;
+    if (recommendation.primary) {
+      trackEvent('view_item', {
+        content_type: 'template',
+        item_id: recommendation.primary,
+        item_category: 'recommend_primary',
+      });
+    }
+    for (const id of recommendation.closeRecs) {
+      trackEvent('view_item', {
+        content_type: 'template',
+        item_id: id,
+        item_category: 'recommend_close',
+      });
+    }
+  }, [showResults, recommendation.primary, recommendation.closeRecs]);
 
   const handleNext = () => {
     if (currentQIndex < totalSteps - 1) {
@@ -355,6 +375,9 @@ export default function Step1Recommend() {
               <button
                 type="button"
                 onClick={() => setIsNotRecOpen((v) => !v)}
+                data-ga-event="select_content"
+                data-ga-param-content-type="accordion_toggle"
+                data-ga-param-item-id="not_rec"
                 className="w-full flex items-center justify-between px-5 py-3.5 bg-[#FEECEC] hover:bg-[#FCE0E0] transition-colors"
                 aria-expanded={isNotRecOpen}
               >
@@ -438,6 +461,9 @@ export default function Step1Recommend() {
             <button
               type="button"
               onClick={handleRestart}
+              data-ga-event="select_content"
+              data-ga-param-content-type="restart"
+              data-ga-param-item-id="recommend_restart"
               className="flex items-center gap-1.5 px-5 py-2.5 rounded-lg border border-border text-sm font-semibold text-text-primary hover:border-primary/40 transition-colors"
             >
               <ArrowsClockwise size={16} />
@@ -446,6 +472,9 @@ export default function Step1Recommend() {
             <button
               type="button"
               onClick={() => setMode('gallery')}
+              data-ga-event="select_content"
+              data-ga-param-content-type="mode_switch"
+              data-ga-param-item-id="to_gallery"
               className="text-sm font-medium text-primary underline underline-offset-2 hover:text-primary-hover transition-colors"
             >
               전체 시안 직접 보기 →
@@ -614,6 +643,9 @@ export default function Step1Recommend() {
           <button
             type="button"
             onClick={() => setMode('gallery')}
+            data-ga-event="select_content"
+            data-ga-param-content-type="mode_switch"
+            data-ga-param-item-id="to_gallery"
             className="text-sm font-medium text-primary underline underline-offset-2 hover:text-primary-hover transition-colors"
           >
             전체 시안 직접 보기 →

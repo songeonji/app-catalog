@@ -302,6 +302,9 @@ export default function Step4Confirm() {
                 <button
                   type="button"
                   onClick={() => setExpandedSection(expandedSection === 'image' ? null : 'image')}
+                  data-ga-event="select_content"
+                  data-ga-param-content-type="accordion_toggle"
+                  data-ga-param-item-id="image_export"
                   className="w-full flex items-center justify-between p-4"
                 >
                   <div className="flex items-center gap-2">
@@ -359,6 +362,9 @@ export default function Step4Confirm() {
                 <button
                   type="button"
                   onClick={() => setExpandedSection(expandedSection === 'send' ? null : 'send')}
+                  data-ga-event="select_content"
+                  data-ga-param-content-type="accordion_toggle"
+                  data-ga-param-item-id="manager_send"
                   className="w-full flex items-center justify-between p-4"
                 >
                   <div className="flex items-center gap-2">
@@ -427,6 +433,10 @@ export default function Step4Confirm() {
                 <button
                   type="button"
                   onClick={handleBackToInteraction}
+                  data-ga-event="select_content"
+                  data-ga-param-content-type="step_back"
+                  data-ga-param-item-id="step4_to_step3"
+                  data-ga-param-item-category="back_link"
                   className="flex items-center gap-1.5 text-sm text-text-muted hover:text-primary transition-colors"
                 >
                   <ArrowLeft size={14} />
@@ -435,6 +445,11 @@ export default function Step4Confirm() {
                 <button
                   type="button"
                   onClick={handleCompareOthers}
+                  data-ga-event="select_content"
+                  data-ga-param-content-type="step_back"
+                  data-ga-param-item-id="step4_to_step1"
+                  data-ga-param-item-category="back_link"
+                  data-ga-param-item-category2="compare_others"
                   className="w-full py-2.5 rounded-lg border border-border text-sm font-medium text-text-secondary hover:bg-white transition-colors"
                 >
                   다른 시안 비교하기

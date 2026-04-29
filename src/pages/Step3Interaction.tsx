@@ -10,6 +10,7 @@ import { useAppStore } from '../store';
 import TopNav from '../components/TopNav';
 import BottomCTA from '../components/BottomCTA';
 import PhoneMockup from '../components/PhoneMockup';
+import { trackEvent } from '../utils/analytics';
 import type { ScreenTab } from '../types';
 
 const SCREEN_TABS: { key: ScreenTab; label: string }[] = [
@@ -129,6 +130,10 @@ export default function Step3Interaction() {
               key={tab.key}
               type="button"
               onClick={() => setActiveScreen(tab.key)}
+              data-ga-event="select_content"
+              data-ga-param-content-type="screen_tab"
+              data-ga-param-item-id={tab.key}
+              data-ga-param-item-category="tab_button"
               className={`px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors ${
                 currentScreen === tab.key
                   ? 'bg-primary text-white'
@@ -201,7 +206,14 @@ export default function Step3Interaction() {
                 headerLogoUrl={customize.headerBI.url}
                 fabIconUrl={customize.fabIconUrl}
                 quickMenuOrder={customize.quickMenuOrder}
-                onScreenChange={(screen) => setActiveScreen(screen as import('../types').ScreenTab)}
+                onScreenChange={(screen) => {
+                  setActiveScreen(screen as import('../types').ScreenTab);
+                  trackEvent('select_content', {
+                    content_type: 'screen_tab',
+                    item_id: screen,
+                    item_category: 'mockup_action',
+                  });
+                }}
               />
             </motion.div>
           </div>
@@ -219,10 +231,20 @@ export default function Step3Interaction() {
           'data-ga-param-item-id': 'step3_to_step4',
           'data-ga-param-item-category': 'bottom_cta',
         }}
+        secondaryDataAttrs={{
+          'data-ga-event': 'select_content',
+          'data-ga-param-content-type': 'step_back',
+          'data-ga-param-item-id': 'step3_to_step2',
+          'data-ga-param-item-category': 'bottom_cta',
+        }}
         leftContent={
           <button
             type="button"
             onClick={handleBack}
+            data-ga-event="select_content"
+            data-ga-param-content-type="step_back"
+            data-ga-param-item-id="step3_to_step2"
+            data-ga-param-item-category="back_link"
             className="flex items-center gap-1.5 text-sm text-text-muted hover:text-text-primary transition-colors"
           >
             <ArrowLeft size={14} />

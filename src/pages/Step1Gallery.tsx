@@ -111,6 +111,9 @@ export default function Step1Gallery() {
           <button
             type="button"
             onClick={() => setMode('recommend')}
+            data-ga-event="select_content"
+            data-ga-param-content-type="mode_switch"
+            data-ga-param-item-id="to_recommend"
             className="text-sm text-text-secondary hover:text-primary transition-colors"
           >
             브랜드 맞춤 시안 추천받기{' '}

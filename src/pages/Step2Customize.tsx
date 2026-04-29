@@ -692,6 +692,10 @@ export default function Step2Customize() {
             <button
               type="button"
               onClick={handleBackToStep1}
+              data-ga-event="select_content"
+              data-ga-param-content-type="step_back"
+              data-ga-param-item-id="step2_to_step1"
+              data-ga-param-item-category="back_link"
               className="flex items-center justify-center gap-1 w-full py-1.5 text-xs font-medium text-primary hover:text-primary-hover transition-colors"
             >
               <CaretLeft size={12} weight="bold" />
