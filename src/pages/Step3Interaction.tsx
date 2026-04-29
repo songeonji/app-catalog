@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
   ArrowsLeftRight,
@@ -80,6 +81,12 @@ export default function Step3Interaction() {
 
   const currentScreen = customize.activeScreen;
   const screenInfo = SCREEN_INFO[currentScreen];
+
+  /** GA4 SPA page_view: 화면 진입 시 1회 */
+  useEffect(() => {
+    window.history.pushState({}, '', '/step3-interaction');
+    document.title = 'STEP 03 인터랙션 체험 · App Catalog';
+  }, []);
 
   const handleConfirm = () => {
     setActiveScreen('home');

@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { createRoot } from 'react-dom/client';
 import { toJpeg, toPng } from 'html-to-image';
@@ -59,6 +59,12 @@ export default function Step4Confirm() {
 
   const [downloading, setDownloading] = useState(false);
   const offscreenRef = useRef<HTMLDivElement>(null);
+
+  /** GA4 SPA page_view: 화면 진입 시 1회 */
+  useEffect(() => {
+    window.history.pushState({}, '', '/step4-confirm');
+    document.title = 'STEP 04 확정·공유 · App Catalog';
+  }, []);
 
   /** 오프스크린 PhoneMockup을 렌더링하고 이미지로 캡처 */
   const captureScreen = useCallback(

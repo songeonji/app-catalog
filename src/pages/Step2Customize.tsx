@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
   ArrowCounterClockwise,
@@ -187,6 +187,12 @@ export default function Step2Customize() {
 
   const [rightPanelOpen, setRightPanelOpen] = useState(false);
   const [dragIdx, setDragIdx] = useState<number | null>(null);
+
+  /** GA4 SPA page_view: 화면 진입 시 1회 */
+  useEffect(() => {
+    window.history.pushState({}, '', '/step2-customize');
+    document.title = 'STEP 02 커스터마이즈 · App Catalog';
+  }, []);
   const logoInputRef = useRef<HTMLInputElement>(null);
   const fabInputRef = useRef<HTMLInputElement>(null);
   const orderIconInputRef = useRef<HTMLInputElement>(null);

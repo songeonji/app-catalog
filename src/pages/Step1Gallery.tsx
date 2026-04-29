@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight } from '@phosphor-icons/react';
 import { useAppStore } from '../store';
@@ -25,6 +26,12 @@ export default function Step1Gallery() {
     completeStep,
     setStep,
   } = useAppStore();
+
+  /** GA4 SPA page_view: 화면 진입 시 1회 */
+  useEffect(() => {
+    window.history.pushState({}, '', '/step1-gallery');
+    document.title = 'STEP 01 전체 시안 · App Catalog';
+  }, []);
 
   const handleSelectTemplate = (id: TemplateId) => {
     setTemplateId(id);

@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Buildings,
@@ -132,6 +132,16 @@ export default function Step1Recommend() {
     () => getRecommendation(recommendAnswers),
     [recommendAnswers],
   );
+
+  /** GA4 SPA page_view: showResults 분기에 따라 가상 페이지 갱신 */
+  useEffect(() => {
+    const path = showResults ? '/step1-recommend-result' : '/step1-recommend-qa';
+    const title = showResults
+      ? 'STEP 01 추천 결과 · App Catalog'
+      : 'STEP 01 추천 모드 · App Catalog';
+    window.history.pushState({}, '', path);
+    document.title = title;
+  }, [showResults]);
 
   const handleNext = () => {
     if (currentQIndex < totalSteps - 1) {
